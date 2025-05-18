@@ -1,0 +1,70 @@
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Media } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import MediaList from '@/components/media/MediaList';
+import FilterSort from '@/components/common/FilterSort';
+import Pagination from '@/components/common/Pagination';
+
+// Force dynamic rendering for every request (optional but good practice here)
+export const dynamic = 'force-dynamic';
+
+export default async function MediaPage({ searchParams }: any) {
+  // Log the type and value
+  console.log('searchParams type:', typeof searchParams, searchParams);
+
+  // If it's a Promise, await it
+  let params = searchParams;
+  if (searchParams && typeof searchParams.then === 'function') {
+    params = await searchParams;
+    console.log('awaited searchParams:', params);
+  }
+
+  let page, pageSize, filterBy, filterValue, sortBy, sortDirection;
+  if (params && typeof params.get === 'function') {
+    page = parseInt(params.get('page') ?? '1');
+    pageSize = parseInt(params.get('pageSize') ?? '10');
+    filterBy = params.get('filterBy');
+    filterValue = params.get('filterValue');
+    sortBy = params.get('sortBy');
+    sortDirection = (params.get('sortDirection') ?? 'asc') as 'asc' | 'desc';
+  } else {
+    page = parseInt(Array.isArray(params?.page) ? params.page[0] : params?.page || '1');
+    pageSize = parseInt(Array.isArray(params?.pageSize) ? params.pageSize[0] : params?.pageSize || '10');
+    filterBy = Array.isArray(params?.filterBy) ? params.filterBy[0] : params?.filterBy;
+    filterValue = Array.isArray(params?.filterValue) ? params.filterValue[0] : params?.filterValue;
+    sortBy = Array.isArray(params?.sortBy) ? params.sortBy[0] : params?.sortBy;
+    sortDirection = (Array.isArray(params?.sortDirection) ? params.sortDirection[0] : params?.sortDirection || 'asc') as 'asc' | 'desc';
+  }
+
+  const { records: media, totalCount } = await fetchRecords<Media>(TABLES.MEDIA, {
+    filterBy,
+    filterValue,
+    sortBy,
+    sortDirection,
+    page,
+    pageSize,
+  });
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const filterFields = [
+    { value: 'title', label: 'Title' },
+    { value: 'type', label: 'Type' },
+    { value: 'storyteller', label: 'Storyteller' },
+  ];
+
+  const sortFields = [
+    { value: 'title', label: 'Title' },
+    { value: 'type', label: 'Type' },
+    { value: 'createdTime', label: 'Created Date' },
+  ];
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Media</h1>
+      <FilterSort filterFields={filterFields} sortFields={sortFields} />
+      <MediaList media={media} />
+      <Pagination currentPage={page} totalPages={totalPages} pageSize={pageSize} />
+    </div>
+  );
+} 

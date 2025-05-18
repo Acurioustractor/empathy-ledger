@@ -1,0 +1,22 @@
+'use client';
+
+import ThemeActions from '@/components/themes/ThemeActions';
+import { useRouter } from 'next/navigation';
+
+export default function NewThemePage() {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Add Theme</h1>
+      <ThemeActions
+        onSuccess={() => {
+          router.push('/themes');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

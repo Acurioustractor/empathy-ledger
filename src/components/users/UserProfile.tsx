@@ -1,6 +1,7 @@
 import React from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import Image from 'next/image';
 
 interface UserProfileProps {
   user: {
@@ -38,16 +39,10 @@ const UserProfile = ({
         <div className="p-6">
           <div className="flex items-start gap-6">
             {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-24 h-24 rounded-full"
-              />
+              <Image src={user.avatar} alt={user.name} width={96} height={96} className="w-24 h-24 rounded-full" />
             ) : (
               <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center">
-                <span className="text-primary-600 font-medium text-3xl">
-                  {user.name.charAt(0)}
-                </span>
+                <span className="text-primary-600 font-medium text-3xl">{user.name.charAt(0)}</span>
               </div>
             )}
             <div className="flex-1">
@@ -64,28 +59,20 @@ const UserProfile = ({
                 )}
               </div>
 
-              {user.bio && (
-                <p className="text-gray-600 mb-4">{user.bio}</p>
-              )}
+              {user.bio && <p className="text-gray-600 mb-4">{user.bio}</p>}
 
               {stats && (
                 <div className="flex gap-6 mb-4">
                   <div>
-                    <span className="font-semibold text-gray-900">
-                      {stats.stories}
-                    </span>
+                    <span className="font-semibold text-gray-900">{stats.stories}</span>
                     <span className="text-gray-500 ml-1">Stories</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-900">
-                      {stats.followers}
-                    </span>
+                    <span className="font-semibold text-gray-900">{stats.followers}</span>
                     <span className="text-gray-500 ml-1">Followers</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-900">
-                      {stats.following}
-                    </span>
+                    <span className="font-semibold text-gray-900">{stats.following}</span>
                     <span className="text-gray-500 ml-1">Following</span>
                   </div>
                 </div>
@@ -189,4 +176,4 @@ const UserProfile = ({
   );
 };
 
-export default UserProfile; 
+export default UserProfile;

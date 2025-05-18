@@ -8,7 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ variant = 'default', children, className = '', ...props }, ref) => {
     const baseStyles = 'rounded-lg bg-white';
-    
+
     const variants = {
       default: 'shadow-sm',
       elevated: 'shadow-md',
@@ -27,4 +27,4 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card';
 
-export default Card; 
+export default Card;

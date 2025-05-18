@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Gallery } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import GalleryActions from '@/components/galleries/GalleryActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface GalleryDetailPageProps {
+  params: { id: string };
+}
+
+export default function GalleryDetailPage({ params }: GalleryDetailPageProps) {
+  const router = useRouter();
+  const [gallery, setGallery] = useState<Gallery | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGallery() {
+      try {
+        const { records: galleries } = await fetchRecords<Gallery>(TABLES.GALLERIES, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setGallery(galleries[0] || null);
+      } catch (error) {
+        console.error('Error fetching gallery:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchGallery();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!gallery) {
+    router.push('/galleries');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Gallery</h1>
+      <GalleryActions
+        gallery={gallery}
+        onSuccess={() => {
+          router.push('/galleries');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

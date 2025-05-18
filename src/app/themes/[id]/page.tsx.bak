@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Theme } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import ThemeActions from '@/components/themes/ThemeActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface ThemeDetailPageProps {
+  params: { id: string };
+}
+
+export default function ThemeDetailPage({ params }: ThemeDetailPageProps) {
+  const router = useRouter();
+  const [theme, setTheme] = useState<Theme | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTheme() {
+      try {
+        const { records: themes } = await fetchRecords<Theme>(TABLES.THEMES, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setTheme(themes[0] || null);
+      } catch (error) {
+        console.error('Error fetching theme:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTheme();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!theme) {
+    router.push('/themes');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Theme</h1>
+      <ThemeActions
+        theme={theme}
+        onSuccess={() => {
+          router.push('/themes');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

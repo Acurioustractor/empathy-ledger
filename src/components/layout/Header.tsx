@@ -11,13 +11,40 @@ const Header = () => {
             <span className="text-xl font-bold text-primary-600">Empathy Ledger</span>
           </Link>
           <nav className="hidden md:flex gap-6">
-            <Link href="/stories" className="text-sm font-medium text-gray-600 hover:text-primary-600">
+            <Link
+              href="/stories"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
               Stories
             </Link>
-            <Link href="/organizations" className="text-sm font-medium text-gray-600 hover:text-primary-600">
-              Organizations
+            <Link
+              href="/storytellers"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              Storytellers
             </Link>
-            <Link href="/about" className="text-sm font-medium text-gray-600 hover:text-primary-600">
+            <Link
+              href="/media"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              Media
+            </Link>
+            <Link
+              href="/themes"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              Themes
+            </Link>
+            <Link
+              href="/constellation"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
+              Constellation
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm font-medium text-gray-600 hover:text-primary-600"
+            >
               About
             </Link>
           </nav>
@@ -35,4 +62,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;

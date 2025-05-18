@@ -1,0 +1,56 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Comment } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import CommentActions from '@/components/comments/CommentActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+export default function CommentDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const [comment, setComment] = useState<Comment | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchComment() {
+      try {
+        const { records: comments } = await fetchRecords<Comment>(TABLES.COMMENTS, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setComment(comments[0] || null);
+      } catch (error) {
+        console.error('Error fetching comment:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchComment();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!comment) {
+    router.push('/comments');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Comment</h1>
+      <CommentActions
+        comment={comment}
+        onSuccess={() => {
+          router.push('/comments');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

@@ -1,0 +1,22 @@
+'use client';
+
+import QuoteActions from '@/components/quotes/QuoteActions';
+import { useRouter } from 'next/navigation';
+
+export default function NewQuotePage() {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Add Quote</h1>
+      <QuoteActions
+        onSuccess={() => {
+          router.push('/quotes');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

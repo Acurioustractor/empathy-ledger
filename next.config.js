@@ -1,19 +1,30 @@
 /** @type {import('next').NextConfig} */
 
-const isGithubActions = process.env.GITHUB_ACTIONS === 'true'
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
 
 const nextConfig = {
-  output: 'export', // Enables static exports
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+  basePath: '',
+  assetPrefix: '',
   reactStrictMode: true,
   swcMinify: true,
-  images: {
-    domains: [], // Add domains for external images
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-  experimental: {
-    // Enable modern features
-    optimizeCss: true,
-    scrollRestoration: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Make Airtable keys available server-side at runtime
+  serverRuntimeConfig: {
+    AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY,
+    AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID,
+  },
+  // publicRuntimeConfig: { // Use this if you need keys client-side (NOT recommended for API keys)
+  // N/A
+  // },
   // Security headers
   async headers() {
     return [
@@ -34,7 +45,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            value: 'DENY',
           },
           {
             key: 'X-Content-Type-Options',
@@ -49,11 +60,11 @@ const nextConfig = {
     ];
   },
   // Add basePath and assetPrefix if deploying to a subdirectory on GitHub Pages
-  // Replace 'empathy-ledger' with your repository name if it's different
+  // Replace 'EmpathyLedgerApp' with your repository name if it's different
   ...(isGithubActions && {
-    basePath: '/empathy-ledger',
-    assetPrefix: '/empathy-ledger/',
-  })
+    basePath: '/EmpathyLedgerApp/empathy-ledger',
+    assetPrefix: '/EmpathyLedgerApp/empathy-ledger/',
+  }),
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Transforming how stories create impact through dignity, agency, and ethical value exchange",
+  "homepage": "https://acurioustractor.github.io/EmpathyLedgerApp/empathy-ledger/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,32 +13,43 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "check-airtable": "node scripts/check-airtable-access.js",
+    "setup-env": "node scripts/setup-env.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d out"
   },
   "keywords": [],
   "author": "Empathy Ledger Team",
   "license": "ISC",
   "dependencies": {
+    "airtable": "^0.12.2",
+    "d3": "^7.9.0",
+    "dotenv": "^16.5.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "autoprefixer": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8",
+    "eslint-config-next": "15.3.1",
+    "gh-pages": "^6.3.0",
     "husky": "^9.1.7",
     "jest": "latest",
     "jest-environment-jsdom": "latest",
-    "postcss": "latest",
+    "node-fetch": "^2.7.0",
+    "postcss": "^8",
     "prettier": "latest",
-    "tailwindcss": "latest",
-    "typescript": "latest"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   },
   "engines": {
     "node": ">=18.0.0"

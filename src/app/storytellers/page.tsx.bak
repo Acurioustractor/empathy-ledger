@@ -1,0 +1,99 @@
+import { fetchRecords } from '@/lib/airtable.utils';
+import { AirtableStoryteller } from '@/lib/airtable-types'; // Assuming this type includes Name, Location, Project, File Profile Image, etc.
+import { AIRTABLE_TABLES } from '@/lib/airtable-tables';
+import FilterSort from '@/components/common/FilterSort';
+import Pagination from '@/components/common/Pagination';
+import StorytellerDisplayToggle from '@/components/storytellers/StorytellerDisplayToggle';
+// We will create StorytellerDisplayToggle and the specific storyteller cards next
+// import StorytellerDisplayToggle from '@/components/storytellers/StorytellerDisplayToggle'; 
+
+export const dynamic = 'force-dynamic';
+
+export default async function StorytellersPage({ searchParams }: any) {
+  let params = searchParams;
+  if (searchParams && typeof searchParams.then === 'function') {
+    params = await searchParams;
+  }
+
+  let page = parseInt(params?.page ?? '1');
+  let pageSize = parseInt(params?.pageSize ?? '12'); // Default to 12 storytellers per page
+  let filterBy = params?.filterBy;
+  let filterValue = params?.filterValue;
+  let sortBy = params?.sortBy || 'Name'; // Default sort by Name
+  let sortDirection = (params?.sortDirection ?? 'asc') as 'asc' | 'desc';
+
+  let storytellers: AirtableStoryteller[] = [];
+  let totalCount = 0;
+  let filterValues = {};
+  let totalPages = 0;
+
+  const fieldsToFetch = ['Name', 'Location', 'Project', 'File Profile Image', 'Role', 'Created At'];
+
+  try {
+    const { records: fetchedStorytellers, totalCount: rawTotalCount } = 
+      await fetchRecords<AirtableStoryteller>(AIRTABLE_TABLES.STORYTELLERS, {
+        filterBy,
+        filterValue,
+        sortBy,
+        sortDirection,
+        fields: fieldsToFetch,
+      });
+    
+    totalCount = rawTotalCount;
+    totalPages = Math.ceil(totalCount / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    storytellers = fetchedStorytellers.slice(startIndex, endIndex);
+
+    const projectSet = new Set<string>();
+    const locationSet = new Set<string>();
+
+    fetchedStorytellers.forEach(storyteller => {
+      if (storyteller.Project) projectSet.add(storyteller.Project);
+      if (storyteller.Location) locationSet.add(storyteller.Location);
+    });
+
+    filterValues = {
+      Project: Array.from(projectSet).sort(),
+      Location: Array.from(locationSet).sort(),
+    };
+
+  } catch (error) {
+    console.error('StorytellersPage - Error fetching storytellers:', error);
+  }
+
+  const filterFields = [
+    { value: 'Project', label: 'Project' },
+    { value: 'Location', label: 'Location' },
+  ];
+
+  const sortFields = [
+    { value: 'Name', label: 'Name' },
+    { value: 'Location', label: 'Location' },
+    { value: 'Created At', label: 'Created Date' }, // Assuming 'Created At' field exists
+  ];
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Storytellers</h1>
+        {/* Button to add storyteller - link to a form or admin page */}
+        {/* <Link href="/storytellers/new" className="...">Add Storyteller</Link> */}
+      </div>
+      <FilterSort filterFields={filterFields} sortFields={sortFields} filterValues={filterValues} />
+      
+      {storytellers.length > 0 ? (
+        <StorytellerDisplayToggle storytellers={storytellers} />
+      ) : (
+        <div className="text-center py-10">
+          <p className="text-gray-500 mb-4">No storytellers found matching your criteria.</p>
+          {/* Link to clear filters or add storyteller */}
+        </div>
+      )}
+      
+      {totalPages > 1 && (
+        <Pagination currentPage={page} totalPages={totalPages} pageSize={pageSize} />
+      )}
+    </div>
+  );
+} 

@@ -1,0 +1,128 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { AirtableStory, AirtableStoryteller, AirtableQuote } from '@/lib/airtable-types';
+import { AIRTABLE_TABLES } from '@/lib/airtable-tables';
+import StoryDetail from '@/components/stories/StoryDetail';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+
+interface StoryDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+// Define the helper type here if it's specific to this page
+interface StoryWithExtras extends AirtableStory {
+    storyteller?: AirtableStoryteller;
+    displayQuoteText?: string;
+}
+
+export default function StoryDetailPage({ params }: StoryDetailPageProps) {
+  const router = useRouter();
+  const [story, setStory] = useState<AirtableStory | null>(null);
+  const [storyteller, setStoryteller] = useState<AirtableStoryteller | null>(null);
+  const [displayQuoteText, setDisplayQuoteText] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  // const [stories, setStories] = useState<AirtableStory[]>([]); // This state was unused here
+
+  const { id } = React.use(params);
+
+  useEffect(() => {
+    // Renamed function to fetchData for clarity
+    async function fetchData() { 
+      if (!id) return;
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { records: fetchedStories } = await fetchRecords<AirtableStory>(AIRTABLE_TABLES.STORIES, {
+          filterBy: 'RECORD_ID()',
+          filterValue: id,
+        });
+
+        const currentStory = fetchedStories[0] || null;
+        setStory(currentStory);
+
+        if (currentStory) { // Outer null check for currentStory
+            if (currentStory.Storytellers?.[0]) {
+              const storytellerId = currentStory.Storytellers[0];
+              const { records: storytellers } = await fetchRecords<AirtableStoryteller>(AIRTABLE_TABLES.STORYTELLERS, {
+                filterBy: 'RECORD_ID()',
+                filterValue: storytellerId,
+              });
+              setStoryteller(storytellers[0] || null);
+            } else if (currentStory['Storytellers (from Media)']?.[0]) {
+              const storytellerId = currentStory['Storytellers (from Media)'][0];
+              const { records: storytellers } = await fetchRecords<AirtableStoryteller>(AIRTABLE_TABLES.STORYTELLERS, {
+                filterBy: 'RECORD_ID()',
+                filterValue: storytellerId,
+              });
+              setStoryteller(storytellers[0] || null);
+            }
+
+            // Fetch quote text - ensure currentStory is non-null here again for clarity with TypeScript
+            if (currentStory["Quotes Rollup (from Media)"] && currentStory["Quotes Rollup (from Media)"].length > 0) {
+              const quoteId = currentStory["Quotes Rollup (from Media)"][0]; 
+              const { records: quotes } = await fetchRecords<AirtableQuote>(AIRTABLE_TABLES.QUOTES, {
+                filterBy: 'RECORD_ID()',
+                filterValue: quoteId,
+              });
+              if (quotes[0] && quotes[0]["Quote Text"]) {
+                setDisplayQuoteText(quotes[0]["Quote Text"]);
+              }
+            }
+        } else {
+             setError("Story not found after fetch."); // Handle case where story fetch returns empty
+        }
+
+      } catch (err) { // Changed error variable name to avoid conflict
+        console.error('Error fetching story, storyteller, or quote:', err);
+        setError("Failed to load story details.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData(); // Call the correctly named function
+  }, [id]);
+
+  useEffect(() => {
+    if (!isLoading && !story && !error) { // Added !error to prevent redirect if an error message is already set
+      console.log('No story found, redirecting...');
+      router.push('/stories');
+    }
+  }, [story, isLoading, error, router]); // Added error to dependency array
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading story details...</div>;
+  }
+
+  if (error) { // Display error message if any
+    return (
+        <div className="container mx-auto py-8 text-center">
+            <p className="text-red-500 text-xl">{error}</p>
+            <Link href="/stories" className="mt-4 inline-block text-indigo-600 hover:underline">
+                &larr; Back to Stories
+            </Link>
+        </div>
+    );
+  }
+
+  if (!story) {
+    return <div className="container mx-auto py-8">Story not found.</div>;
+  }
+
+  // Use the defined StoryWithExtras type
+  const storyForDetail: StoryWithExtras = {
+    ...story,
+    storyteller: storyteller || undefined,
+    displayQuoteText,
+  };
+
+  return (
+    <div className="container mx-auto py-8">
+      <StoryDetail story={storyForDetail} />
+    </div>
+  );
+} 

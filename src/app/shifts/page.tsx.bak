@@ -1,0 +1,49 @@
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Shift } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import ShiftList from '@/components/shifts/ShiftList';
+import FilterSort from '@/components/common/FilterSort';
+import Pagination from '@/components/common/Pagination';
+
+export default async function ShiftsPage({ searchParams }: { searchParams: Promise<URLSearchParams> }) {
+  const params = await searchParams;
+  const page = parseInt(params.get('page') ?? '1');
+  const pageSize = parseInt(params.get('pageSize') ?? '10');
+  const filterBy = params.get('filterBy');
+  const filterValue = params.get('filterValue');
+  const sortBy = params.get('sortBy');
+  const sortDirection = (params.get('sortDirection') ?? 'asc') as 'asc' | 'desc';
+
+  const { records: shifts, totalCount } = await fetchRecords<Shift>(TABLES.SHIFTS, {
+    filterBy,
+    filterValue,
+    sortBy,
+    sortDirection,
+    page,
+    pageSize,
+  });
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const filterFields = [
+    { value: 'name', label: 'Name' },
+    { value: 'date', label: 'Date' },
+    { value: 'storyteller', label: 'Storyteller' },
+    { value: 'theme', label: 'Theme' },
+  ];
+
+  const sortFields = [
+    { value: 'name', label: 'Name' },
+    { value: 'date', label: 'Date' },
+    { value: 'createdTime', label: 'Created Date' },
+  ];
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Shifts</h1>
+      <FilterSort filterFields={filterFields} sortFields={sortFields} />
+      <ShiftList shifts={shifts} />
+      <Pagination currentPage={page} totalPages={totalPages} pageSize={pageSize} />
+    </div>
+  );
+} 

@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Quote } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import QuoteActions from '@/components/quotes/QuoteActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface QuoteDetailPageProps {
+  params: { id: string };
+}
+
+export default function QuoteDetailPage({ params }: QuoteDetailPageProps) {
+  const router = useRouter();
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchQuote() {
+      try {
+        const { records: quotes } = await fetchRecords<Quote>(TABLES.QUOTES, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setQuote(quotes[0] || null);
+      } catch (error) {
+        console.error('Error fetching quote:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchQuote();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!quote) {
+    router.push('/quotes');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Quote</h1>
+      <QuoteActions
+        quote={quote}
+        onSuccess={() => {
+          router.push('/quotes');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

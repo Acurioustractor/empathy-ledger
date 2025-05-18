@@ -1,0 +1,22 @@
+'use client';
+
+import MediaActions from '@/components/media/MediaActions';
+import { useRouter } from 'next/navigation';
+
+export default function NewMediaPage() {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Add Media</h1>
+      <MediaActions
+        onSuccess={() => {
+          router.push('/media');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

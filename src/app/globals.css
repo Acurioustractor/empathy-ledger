@@ -4,17 +4,22 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 248, 249, 250;
+  --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
+    rgb(var(--background-start-rgb));
 }
 
 @layer base {
@@ -42,4 +47,51 @@ body {
   .card {
     @apply bg-white rounded-lg shadow-md p-6;
   }
-} 
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Added Keyframes for Constellation Views */
+
+@keyframes float {
+  0% {
+    transform: translateY(0vh) translateX(0vw) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    /* Randomize end X position for more variation - use CSS var if needed */
+    transform: translateY(-100vh) translateX(calc(var(--random-x, 0) * 1vw)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    filter: brightness(1);
+    /* Optional: add subtle scale or shadow changes */
+    /* text-shadow: 0 0 5px currentColor; */
+  }
+  50% {
+    filter: brightness(1.3);
+    /* Optional: enhance effect */
+    /* text-shadow: 0 0 15px currentColor; */
+  }
+}
+
++.animate-pulseGlow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

@@ -1,0 +1,18 @@
+export const AIRTABLE_TABLES = {
+  STORYTELLERS: 'Storytellers',
+  MEDIA: 'Media',
+  THEMES: 'Themes',
+  QUOTES: 'Quotes',
+  GALLERIES: 'Galleries',
+  STORIES: 'Stories',
+  SHIFTS: 'Shifts',
+  MANUAL_TAGS: 'Manual Tags',
+  COMMENTS: 'Comments',
+  CONTACT: 'Contact',
+  USERS: 'Users',
+  ASSIGNMENT_TABLE: 'Assignment Table',
+  POST_SHIFT_REFLECTION: 'Post-Shift Reflection',
+  PHOTOGRAPHER_THEMES: 'Photographer Themes',
+  FORMS: 'Forms',
+  EMPATHY_JOURNAL: 'Empathy Journal',
+} as const;

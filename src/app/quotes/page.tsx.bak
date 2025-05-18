@@ -1,0 +1,14 @@
+import { fetchAllRecords } from '@/lib/airtable';
+import { Quote } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import QuoteList from '@/components/quotes/QuoteList';
+
+export default async function QuotesPage() {
+  const quotes: Quote[] = await fetchAllRecords<Quote>(TABLES.QUOTES);
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Quotes</h1>
+      <QuoteList quotes={quotes} />
+    </div>
+  );
+} 

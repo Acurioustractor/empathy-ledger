@@ -1,0 +1,22 @@
+'use client';
+
+import ShiftActions from '@/components/shifts/ShiftActions';
+import { useRouter } from 'next/navigation';
+
+export default function NewShiftPage() {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Add Shift</h1>
+      <ShiftActions
+        onSuccess={() => {
+          router.push('/shifts');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

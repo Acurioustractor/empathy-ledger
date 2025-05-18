@@ -19,11 +19,7 @@ interface CommentSectionProps {
   onLikeComment: (commentId: string) => void;
 }
 
-const CommentSection = ({
-  comments,
-  onAddComment,
-  onLikeComment,
-}: CommentSectionProps) => {
+const CommentSection = ({ comments, onAddComment, onLikeComment }: CommentSectionProps) => {
   const [newComment, setNewComment] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,31 +34,25 @@ const CommentSection = ({
     <div className="space-y-8">
       <Card>
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Comments ({comments.length})
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Comments ({comments.length})</h3>
 
           <form onSubmit={handleSubmit} className="mb-6">
             <textarea
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={e => setNewComment(e.target.value)}
               placeholder="Share your thoughts..."
               className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               rows={4}
             />
             <div className="flex justify-end mt-4">
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={!newComment.trim()}
-              >
+              <Button type="submit" variant="primary" disabled={!newComment.trim()}>
                 Post Comment
               </Button>
             </div>
           </form>
 
           <div className="space-y-6">
-            {comments.map((comment) => (
+            {comments.map(comment => (
               <div key={comment.id} className="border-t border-gray-100 pt-6">
                 <div className="flex items-start gap-4">
                   {comment.author.avatar ? (
@@ -81,9 +71,7 @@ const CommentSection = ({
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {comment.author.name}
-                        </p>
+                        <p className="font-medium text-gray-900">{comment.author.name}</p>
                         <p className="text-sm text-gray-500">
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </p>
@@ -120,4 +108,4 @@ const CommentSection = ({
   );
 };
 
-export default CommentSection; 
+export default CommentSection;

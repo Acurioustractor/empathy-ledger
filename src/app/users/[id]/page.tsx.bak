@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { User } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import UserActions from '@/components/users/UserActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface UserDetailPageProps {
+  params: { id: string };
+}
+
+export default function UserDetailPage({ params }: UserDetailPageProps) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const { records: users } = await fetchRecords<User>(TABLES.USERS, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setUser(users[0] || null);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!user) {
+    router.push('/users');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit User</h1>
+      <UserActions
+        user={user}
+        onSuccess={() => {
+          router.push('/users');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

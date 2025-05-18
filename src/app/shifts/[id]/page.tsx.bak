@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Shift } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import ShiftActions from '@/components/shifts/ShiftActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface ShiftDetailPageProps {
+  params: { id: string };
+}
+
+export default function ShiftDetailPage({ params }: ShiftDetailPageProps) {
+  const router = useRouter();
+  const [shift, setShift] = useState<Shift | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchShift() {
+      try {
+        const { records: shifts } = await fetchRecords<Shift>(TABLES.SHIFTS, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setShift(shifts[0] || null);
+      } catch (error) {
+        console.error('Error fetching shift:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchShift();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!shift) {
+    router.push('/shifts');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Shift</h1>
+      <ShiftActions
+        shift={shift}
+        onSuccess={() => {
+          router.push('/shifts');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

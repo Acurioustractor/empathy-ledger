@@ -1,0 +1,41 @@
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Comment } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import CommentList from '@/components/comments/CommentList';
+import FilterSort from '@/components/common/FilterSort';
+import Pagination from '@/components/common/Pagination';
+
+export default async function CommentsPage({ searchParams }: { searchParams: { filterBy?: string; filterValue?: string; sortBy?: string; sortDirection?: 'asc' | 'desc'; page?: string; pageSize?: string; } }) {
+  const page = parseInt(searchParams.page || '1');
+  const pageSize = parseInt(searchParams.pageSize || '10');
+
+  const { records: comments, totalCount } = await fetchRecords<Comment>(TABLES.COMMENTS, {
+    filterBy: searchParams.filterBy,
+    filterValue: searchParams.filterValue,
+    sortBy: searchParams.sortBy,
+    sortDirection: searchParams.sortDirection as 'asc' | 'desc',
+    page,
+    pageSize,
+  });
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const filterFields = [
+    { value: 'author', label: 'Author' },
+    { value: 'relatedRecord', label: 'Related Record' },
+  ];
+
+  const sortFields = [
+    { value: 'author', label: 'Author' },
+    { value: 'createdTime', label: 'Created Date' },
+  ];
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Comments</h1>
+      <FilterSort filterFields={filterFields} sortFields={sortFields} />
+      <CommentList comments={comments} />
+      <Pagination currentPage={page} totalPages={totalPages} pageSize={pageSize} />
+    </div>
+  );
+} 

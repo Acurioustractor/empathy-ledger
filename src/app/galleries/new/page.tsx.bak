@@ -1,0 +1,22 @@
+'use client';
+
+import GalleryActions from '@/components/galleries/GalleryActions';
+import { useRouter } from 'next/navigation';
+
+export default function NewGalleryPage() {
+  const router = useRouter();
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Add Gallery</h1>
+      <GalleryActions
+        onSuccess={() => {
+          router.push('/galleries');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

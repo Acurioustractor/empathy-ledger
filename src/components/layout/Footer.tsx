@@ -21,7 +21,10 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/organizations" className="text-sm text-gray-600 hover:text-primary-600">
+                <Link
+                  href="/organizations"
+                  className="text-sm text-gray-600 hover:text-primary-600"
+                >
                   Organizations
                 </Link>
               </li>
@@ -83,4 +86,4 @@ const Footer = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

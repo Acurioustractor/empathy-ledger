@@ -1,0 +1,60 @@
+'use client';
+
+import { fetchRecords } from '@/lib/airtable.utils';
+import { Media } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import MediaActions from '@/components/media/MediaActions';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface MediaDetailPageProps {
+  params: { id: string };
+}
+
+export default function MediaDetailPage({ params }: MediaDetailPageProps) {
+  const router = useRouter();
+  const [media, setMedia] = useState<Media | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchMedia() {
+      try {
+        const { records: mediaItems } = await fetchRecords<Media>(TABLES.MEDIA, {
+          filterBy: 'id',
+          filterValue: params.id,
+        });
+        setMedia(mediaItems[0] || null);
+      } catch (error) {
+        console.error('Error fetching media:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchMedia();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <div className="container mx-auto py-8">Loading...</div>;
+  }
+
+  if (!media) {
+    router.push('/media');
+    return null;
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Edit Media</h1>
+      <MediaActions
+        media={media}
+        onSuccess={() => {
+          router.push('/media');
+        }}
+        onError={(error) => {
+          console.error('Error:', error);
+        }}
+      />
+    </div>
+  );
+} 

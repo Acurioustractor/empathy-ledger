@@ -1,153 +1,101 @@
 import React from 'react';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
+import { StoryWithDetails } from '@/lib/airtable-wrappers';
+import Image from 'next/image';
 
 interface StoryDetailProps {
-  id: string;
-  title: string;
-  content: string;
-  author: {
-    name: string;
-    avatar?: string;
-    bio?: string;
-  };
-  tags?: string[];
-  createdAt: string;
-  updatedAt?: string;
-  engagement?: {
-    views: number;
-    likes: number;
-    comments: number;
-  };
-  onLike?: () => void;
-  onComment?: () => void;
+  story: StoryWithDetails;
 }
 
-const StoryDetail = ({
-  id,
-  title,
-  content,
-  author,
-  tags = [],
-  createdAt,
-  updatedAt,
-  engagement,
-  onLike,
-  onComment,
-}: StoryDetailProps) => {
-  return (
-    <article className="max-w-4xl mx-auto">
-      <header className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{title}</h1>
-        
-        <div className="flex items-center gap-4 mb-6">
-          {author.avatar ? (
-            <img
-              src={author.avatar}
-              alt={author.name}
-              className="w-12 h-12 rounded-full"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-              <span className="text-primary-600 font-medium text-xl">
-                {author.name.charAt(0)}
-              </span>
-            </div>
-          )}
-          <div>
-            <p className="font-medium text-gray-900">{author.name}</p>
-            <p className="text-sm text-gray-500">
-              {new Date(createdAt).toLocaleDateString()}
-              {updatedAt && ` (Updated ${new Date(updatedAt).toLocaleDateString()})`}
-            </p>
-          </div>
-        </div>
+export default function StoryDetail({ story }: StoryDetailProps) {
+  // Story info
+  const rawTitle = story.Title;
+  const title = typeof rawTitle === 'string' || typeof rawTitle === 'number' ? rawTitle : 'Untitled Story';
+  const rawCreated = story.Created || story.createdTime;
+  const created = typeof rawCreated === 'string' || typeof rawCreated === 'number' ? rawCreated : '';
+  const location = Array.isArray(story['Location (from Media)']) ? story['Location (from Media)'][0] : '';
+  const keyQuote =
+    story.displayQuoteText && !story.displayQuoteText.startsWith('rec')
+      ? story.displayQuoteText
+      : '';
+  const rawThemes = story.Themes;
+  const themes = Array.isArray(rawThemes) ? rawThemes : [];
+  const rawImages = story['Story Image'];
+  const images = Array.isArray(rawImages) ? rawImages : [];
+  const videoEmbed = story['Video Embed Code'] || '';
 
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            {tags.map((tag) => (
+  return (
+    <div className="max-w-3xl mx-auto py-10 px-4">
+      {/* Title */}
+      <section className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
+        <div className="flex items-center gap-2">
+          {created && (
+            <span className="text-sm text-gray-500">{new Date(created).toLocaleDateString()}</span>
+          )}
+          {location && (
+            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+              📍 {location}
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* Key Quote */}
+      {keyQuote && (
+        <blockquote className="mb-8 p-4 border-l-4 border-indigo-500 bg-indigo-50 text-indigo-700 italic text-xl font-medium">
+          “{keyQuote}”
+        </blockquote>
+      )}
+
+      {/* Story Images */}
+      {images.length > 0 && (
+        <section className="mb-8">
+          <div className="flex flex-wrap gap-4 justify-center">
+            {images.map((img: { url?: string; width?: number; height?: number } | string, idx: number) => {
+              const src = typeof img === 'string' ? img : img.url || '';
+              // Fallback width/height for static export safety
+              const width = typeof img === 'object' && img.width ? img.width : 800;
+              const height = typeof img === 'object' && img.height ? img.height : 600;
+              return (
+                <Image
+                  key={idx}
+                  src={src}
+                  alt={title + ' image'}
+                  width={width}
+                  height={height}
+                  className="rounded-lg shadow max-h-96 object-cover"
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Themes */}
+      {themes.length > 0 && (
+        <section className="mb-8">
+          <h3 className="text-lg font-semibold mb-2">Themes</h3>
+          <div className="flex flex-wrap gap-2">
+            {themes.map((theme: { id?: string; themeName?: string } | string) => (
               <span
-                key={tag}
-                className="px-3 py-1 text-sm font-medium text-primary-600 bg-primary-50 rounded-full"
+                key={typeof theme === 'string' ? theme : theme.id || ''}
+                className="px-3 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-full"
               >
-                {tag}
+                {typeof theme === 'string' ? theme : theme.themeName || ''}
               </span>
             ))}
           </div>
-        )}
-
-        {engagement && (
-          <div className="flex items-center gap-6 text-sm text-gray-500 mb-6">
-            <span>{engagement.views} views</span>
-            <button
-              onClick={onLike}
-              className="flex items-center gap-1 hover:text-primary-600"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-              {engagement.likes} likes
-            </button>
-            <button
-              onClick={onComment}
-              className="flex items-center gap-1 hover:text-primary-600"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-              {engagement.comments} comments
-            </button>
-          </div>
-        )}
-      </header>
-
-      <Card className="mb-8">
-        <div className="p-6 prose max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: content }} />
-        </div>
-      </Card>
-
-      {author.bio && (
-        <Card className="mb-8">
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              About the Author
-            </h3>
-            <p className="text-gray-600">{author.bio}</p>
-          </div>
-        </Card>
+        </section>
       )}
 
-      <div className="flex justify-center gap-4">
-        <Button variant="primary" onClick={onLike}>
-          Like Story
-        </Button>
-        <Button variant="outline" onClick={onComment}>
-          Add Comment
-        </Button>
-      </div>
-    </article>
+      {/* Video Embed */}
+      {videoEmbed && (
+        <section className="mb-8">
+          <div className="aspect-video w-full max-w-2xl mx-auto rounded-lg overflow-hidden shadow">
+            <div dangerouslySetInnerHTML={{ __html: videoEmbed }} />
+          </div>
+        </section>
+      )}
+    </div>
   );
-};
-
-export default StoryDetail; 
+}

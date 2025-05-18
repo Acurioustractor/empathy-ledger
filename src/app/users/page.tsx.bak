@@ -1,0 +1,48 @@
+import { fetchRecords } from '@/lib/airtable.utils';
+import { User } from '@/lib/airtable.types';
+import { TABLES } from '@/lib/airtable.config';
+import UserList from '@/components/users/UserList';
+import FilterSort from '@/components/common/FilterSort';
+import Pagination from '@/components/common/Pagination';
+
+export default async function UsersPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const page = parseInt(Array.isArray(searchParams.page) ? searchParams.page[0] : searchParams.page || '1');
+  const pageSize = parseInt(Array.isArray(searchParams.pageSize) ? searchParams.pageSize[0] : searchParams.pageSize || '10');
+  const filterBy = Array.isArray(searchParams.filterBy) ? searchParams.filterBy[0] : searchParams.filterBy;
+  const filterValue = Array.isArray(searchParams.filterValue) ? searchParams.filterValue[0] : searchParams.filterValue;
+  const sortBy = Array.isArray(searchParams.sortBy) ? searchParams.sortBy[0] : searchParams.sortBy;
+  const sortDirection = (Array.isArray(searchParams.sortDirection) ? searchParams.sortDirection[0] : searchParams.sortDirection || 'asc') as 'asc' | 'desc';
+
+  const { records: users, totalCount } = await fetchRecords<User>(TABLES.USERS, {
+    filterBy,
+    filterValue,
+    sortBy,
+    sortDirection,
+    page,
+    pageSize,
+  });
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const filterFields = [
+    { value: 'name', label: 'Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'location', label: 'Location' },
+  ];
+
+  const sortFields = [
+    { value: 'name', label: 'Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'location', label: 'Location' },
+    { value: 'createdTime', label: 'Created Date' },
+  ];
+
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Users</h1>
+      <FilterSort filterFields={filterFields} sortFields={sortFields} />
+      <UserList users={users} />
+      <Pagination currentPage={page} totalPages={totalPages} pageSize={pageSize} />
+    </div>
+  );
+} 
