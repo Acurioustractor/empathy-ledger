@@ -1,0 +1,9 @@
+{
+  "name": "The Empathy Ledger",
+  "short_name": "Empathy Ledger",
+  "description": "These stories are here by choice. They may leave at any time.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0908",
+  "theme_color": "#0a0908"
+}
