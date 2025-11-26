@@ -35,7 +35,7 @@ export const supabase = isSupabaseConfigured
   : createMockClient();
 
 // Server-side Supabase client with service role (for admin operations)
-export const createServerClient = () => {
+export const createServerClient = (): SupabaseClient<Database> => {
   if (!isSupabaseConfigured) {
     return createMockClient();
   }
