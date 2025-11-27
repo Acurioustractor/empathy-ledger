@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
       portrait_id: portraitId,
       word: cleanWord,
     };
-    // @ts-ignore - Supabase type inference issue with Database schema
     const { data: message, error: messageError } = await supabase
       .from('messages')
+      // @ts-expect-error - Supabase type inference issue with Database schema
       .insert(messageData)
       .select()
       .single();
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       event_type: 'message',
       metadata: { word: cleanWord, message_id: message.id },
     };
-    // @ts-ignore - Supabase type inference issue
+    // @ts-expect-error - Supabase type inference issue
     await supabase.from('pulse_events').insert(pulseData);
 
     // Increment click count (message is a form of engagement)

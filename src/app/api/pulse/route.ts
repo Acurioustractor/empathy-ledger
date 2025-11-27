@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       event_type: eventType as 'view' | 'hover' | 'click' | 'message',
       metadata: metadata || null,
     };
-    // @ts-ignore - Supabase type inference issue with Database schema
+    // @ts-expect-error - Supabase type inference issue with Database schema
     const { error: pulseError } = await supabase.from('pulse_events').insert(pulseData);
 
     if (pulseError) {
