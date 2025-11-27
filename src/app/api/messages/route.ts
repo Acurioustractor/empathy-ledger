@@ -101,11 +101,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Type the portrait explicitly
+    const typedPortrait = portrait as { id: string };
+
     // Get messages for this portrait
     const { data: messages, error: messagesError } = await supabase
       .from('messages')
       .select('*')
-      .eq('portrait_id', portrait.id)
+      .eq('portrait_id', typedPortrait.id)
       .order('created_at', { ascending: false });
 
     if (messagesError) {
