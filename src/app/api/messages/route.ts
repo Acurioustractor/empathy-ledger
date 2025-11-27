@@ -47,11 +47,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Type the message explicitly since @ts-expect-error breaks inference
+    const typedMessage = message as Database['public']['Tables']['messages']['Row'];
+
     // Create a pulse event for the message (triggers notification)
     const pulseData: Database['public']['Tables']['pulse_events']['Insert'] = {
       portrait_id: portraitId,
       event_type: 'message',
-      metadata: { word: cleanWord, message_id: message.id },
+      metadata: { word: cleanWord, message_id: typedMessage.id },
     };
     // @ts-expect-error - Supabase type inference issue
     await supabase.from('pulse_events').insert(pulseData);
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Increment click count (message is a form of engagement)
     await supabase.rpc('increment_clicks', { portrait_uuid: portraitId });
 
-    return NextResponse.json({ success: true, message });
+    return NextResponse.json({ success: true, message: typedMessage });
   } catch (error) {
     console.error('Messages API error:', error);
     return NextResponse.json(
