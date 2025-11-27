@@ -84,7 +84,7 @@ export function useStorytellerPortrait(accessCode: string) {
     try {
       const { error } = await supabase
         .from('portraits')
-        .update({ visible: !portrait.visible })
+        .update({ visible: !portrait.visible } as any)
         .eq('id', portrait.id);
 
       if (error) throw error;
@@ -99,7 +99,7 @@ export function useStorytellerPortrait(accessCode: string) {
     try {
       await supabase
         .from('messages')
-        .update({ read: true })
+        .update({ read: true } as any)
         .eq('id', messageId);
 
       setMessages((prev) =>

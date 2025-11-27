@@ -98,7 +98,7 @@ function DashboardContent() {
     try {
       const { error: updateError } = await supabase
         .from('portraits')
-        .update({ visible: !portrait.visible })
+        .update({ visible: !portrait.visible } as any)
         .eq('id', portrait.id);
 
       if (updateError) throw updateError;
@@ -114,7 +114,7 @@ function DashboardContent() {
 
   // Mark message as read
   const handleMarkRead = async (messageId: string) => {
-    await supabase.from('messages').update({ read: true }).eq('id', messageId);
+    await supabase.from('messages').update({ read: true } as any).eq('id', messageId);
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))
     );
