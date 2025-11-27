@@ -121,6 +121,7 @@ export async function PATCH(request: NextRequest) {
 
     const { data: portrait, error } = await supabase
       .from('portraits')
+      // @ts-expect-error - Dynamic updates object type
       .update(updates)
       .eq('access_code', accessCode)
       .select()
