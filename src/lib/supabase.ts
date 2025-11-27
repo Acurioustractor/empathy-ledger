@@ -1,52 +1,26 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './database.types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// For build-time TypeScript compilation, use placeholder values if not configured
+// At runtime, the actual values from environment variables will be used
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTIwMDAsImV4cCI6MTk2MDc2ODAwMH0.placeholder';
 
-// Check if Supabase is configured
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+// Check if Supabase is actually configured (not using placeholders)
+export const isSupabaseConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
-// Create a mock client for demo mode
-const createMockClient = (): SupabaseClient<Database> => {
-  const mockResponse = { data: null, error: { message: 'Demo mode - Supabase not configured' } };
-
-  return {
-    from: () => ({
-      select: () => Promise.resolve(mockResponse),
-      insert: () => ({
-        select: () => ({
-          single: () => Promise.resolve(mockResponse),
-        }),
-      }),
-      update: () => Promise.resolve(mockResponse),
-      upsert: () => Promise.resolve(mockResponse),
-      delete: () => Promise.resolve(mockResponse),
-      eq: () => ({ single: () => Promise.resolve(mockResponse), select: () => Promise.resolve(mockResponse) }),
-      order: () => Promise.resolve(mockResponse),
-    }),
-    rpc: () => Promise.resolve(mockResponse),
-    channel: () => ({
-      on: () => ({ subscribe: () => {} }),
-    }),
-    removeChannel: () => {},
-  } as any as SupabaseClient<Database>;
-};
-
-// Client-side Supabase client (or mock in demo mode)
-export const supabase = isSupabaseConfigured
-  ? createClient<Database>(supabaseUrl, supabaseAnonKey)
-  : createMockClient();
+// Always create a real Supabase client for proper TypeScript inference
+// If using placeholders, API calls will fail at runtime but types will work at build time
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 // Server-side Supabase client with service role (for admin operations)
 export const createServerClient = (): SupabaseClient<Database> => {
-  if (!isSupabaseConfigured) {
-    return createMockClient();
-  }
-
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) {
-    return supabase; // Fallback to anon client
+  if (serviceRoleKey) {
+    return createClient<Database>(supabaseUrl, serviceRoleKey);
   }
-  return createClient<Database>(supabaseUrl, serviceRoleKey);
+  return supabase; // Fallback to anon client
 };
