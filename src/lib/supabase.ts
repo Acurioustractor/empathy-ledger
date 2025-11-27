@@ -8,13 +8,17 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 // Create a mock client for demo mode
-const createMockClient = () => {
+const createMockClient = (): SupabaseClient<Database> => {
   const mockResponse = { data: null, error: { message: 'Demo mode - Supabase not configured' } };
 
   return {
     from: () => ({
       select: () => Promise.resolve(mockResponse),
-      insert: () => Promise.resolve(mockResponse),
+      insert: () => ({
+        select: () => ({
+          single: () => Promise.resolve(mockResponse),
+        }),
+      }),
       update: () => Promise.resolve(mockResponse),
       upsert: () => Promise.resolve(mockResponse),
       delete: () => Promise.resolve(mockResponse),
@@ -26,7 +30,7 @@ const createMockClient = () => {
       on: () => ({ subscribe: () => {} }),
     }),
     removeChannel: () => {},
-  } as unknown as SupabaseClient<Database>;
+  } as any as SupabaseClient<Database>;
 };
 
 // Client-side Supabase client (or mock in demo mode)

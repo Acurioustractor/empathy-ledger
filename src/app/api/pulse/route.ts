@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       event_type: eventType as 'view' | 'hover' | 'click' | 'message',
       metadata: metadata || null,
     };
-    const { error: pulseError } = await supabase.from('pulse_events').insert(pulseData);
+    const { error: pulseError } = await (supabase.from('pulse_events').insert(pulseData) as any);
 
     if (pulseError) {
       console.error('Pulse event error:', pulseError);
