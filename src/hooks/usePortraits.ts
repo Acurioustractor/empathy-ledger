@@ -57,19 +57,18 @@ export function useStorytellerPortrait(accessCode: string) {
         .eq('access_code', accessCode)
         .single();
 
-      if (error) throw error;
+      if (error || !data) throw new Error('Portrait not found');
+
       setPortrait(data);
 
       // Fetch messages for this portrait
-      if (data) {
-        const { data: messagesData } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('portrait_id', data.id)
-          .order('created_at', { ascending: false });
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('portrait_id', data.id)
+        .order('created_at', { ascending: false });
 
-        setMessages(messagesData || []);
-      }
+      setMessages(messagesData || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Portrait not found');
     } finally {

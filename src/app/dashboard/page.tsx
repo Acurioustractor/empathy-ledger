@@ -38,19 +38,18 @@ function DashboardContent() {
         .eq('access_code', accessCode)
         .single();
 
-      if (fetchError) throw fetchError;
+      if (fetchError || !data) throw new Error('Portrait not found');
+
       setPortrait(data);
 
-      // Fetch messages
-      if (data) {
-        const { data: messagesData } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('portrait_id', data.id)
-          .order('created_at', { ascending: false });
+      // Fetch messages for this portrait
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('portrait_id', data.id)
+        .order('created_at', { ascending: false });
 
-        setMessages(messagesData || []);
-      }
+      setMessages(messagesData || []);
     } catch (err) {
       setError('Portrait not found. Check your access code.');
     } finally {
