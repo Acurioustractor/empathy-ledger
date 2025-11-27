@@ -22,7 +22,10 @@ export function usePortraits() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPortraits(data || []);
+
+      // Type cast since Supabase client has type inference issues
+      const typedPortraits = (data || []) as Portrait[];
+      setPortraits(typedPortraits);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch portraits');
     } finally {
@@ -58,17 +61,22 @@ export function useStorytellerPortrait(accessCode: string) {
         .single();
 
       if (error) throw error;
-      setPortrait(data);
+
+      // Type cast since Supabase client has type inference issues
+      const typedPortrait = data as Portrait | null;
+      setPortrait(typedPortrait);
 
       // Fetch messages for this portrait
-      if (data) {
+      if (typedPortrait) {
         const { data: messagesData } = await supabase
           .from('messages')
           .select('*')
-          .eq('portrait_id', data.id)
+          .eq('portrait_id', typedPortrait.id)
           .order('created_at', { ascending: false });
 
-        setMessages(messagesData || []);
+        // Type cast messages data
+        const typedMessages = (messagesData || []) as Message[];
+        setMessages(typedMessages);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Portrait not found');
@@ -81,6 +89,7 @@ export function useStorytellerPortrait(accessCode: string) {
     if (!portrait) return;
 
     try {
+      // @ts-expect-error - Client-side Supabase type inference issue
       const { error } = await supabase
         .from('portraits')
         .update({ visible: !portrait.visible })
@@ -96,6 +105,7 @@ export function useStorytellerPortrait(accessCode: string) {
 
   const markMessageRead = useCallback(async (messageId: string) => {
     try {
+      // @ts-expect-error - Client-side Supabase type inference issue
       await supabase
         .from('messages')
         .update({ read: true })
