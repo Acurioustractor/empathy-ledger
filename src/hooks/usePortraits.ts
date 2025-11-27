@@ -61,11 +61,11 @@ export function useStorytellerPortrait(accessCode: string) {
 
       setPortrait(data);
 
-      // Fetch messages for this portrait
+      // Fetch messages for this portrait (using non-null assertion since we validated above)
       const { data: messagesData } = await supabase
         .from('messages')
         .select('*')
-        .eq('portrait_id', data.id)
+        .eq('portrait_id', data!.id)
         .order('created_at', { ascending: false });
 
       setMessages(messagesData || []);
