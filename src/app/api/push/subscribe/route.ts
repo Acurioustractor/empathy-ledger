@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
 
     // Upsert subscription (update if exists, insert if not)
+    // @ts-expect-error - Supabase type inference issue with Database schema
     const { error } = await supabase.from('push_subscriptions').upsert(
       {
         storyteller_id: storytellerId,

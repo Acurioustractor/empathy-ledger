@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import type { Database } from '@/lib/database.types';
 
 // Get all visible portraits (public)
 export async function GET() {
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
 
     const { data: portrait, error } = await supabase
       .from('portraits')
+      // @ts-expect-error - Supabase type inference issue with Database schema
       .insert({
         image_url: imageUrl,
         name: name || null,
@@ -71,12 +73,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Type the portrait explicitly since @ts-expect-error breaks inference
+    const typedPortrait = portrait as Database['public']['Tables']['portraits']['Row'];
+
     return NextResponse.json({
       success: true,
-      portrait,
+      portrait: typedPortrait,
       // Return the access code so storyteller can access their dashboard
-      accessCode: portrait.access_code,
-      dashboardUrl: `/dashboard?code=${portrait.access_code}`,
+      accessCode: typedPortrait.access_code,
+      dashboardUrl: `/dashboard?code=${typedPortrait.access_code}`,
     });
   } catch (error) {
     console.error('Portraits POST error:', error);
@@ -114,6 +119,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // @ts-expect-error - Supabase type inference issue with Database schema
     const { data: portrait, error } = await supabase
       .from('portraits')
       .update(updates)
@@ -129,7 +135,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, portrait });
+    // Type the portrait explicitly
+    const typedPortrait = portrait as Database['public']['Tables']['portraits']['Row'];
+
+    return NextResponse.json({ success: true, portrait: typedPortrait });
   } catch (error) {
     console.error('Portraits PATCH error:', error);
     return NextResponse.json(
