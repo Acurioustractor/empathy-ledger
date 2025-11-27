@@ -32,9 +32,10 @@ export async function POST(request: NextRequest) {
       portrait_id: portraitId,
       word: cleanWord,
     };
-    const { data: message, error: messageError } = await (supabase
+    // @ts-ignore - Supabase type inference issue with Database schema
+    const { data: message, error: messageError } = await supabase
       .from('messages')
-      .insert(messageData) as any)
+      .insert(messageData)
       .select()
       .single();
 
@@ -52,7 +53,8 @@ export async function POST(request: NextRequest) {
       event_type: 'message',
       metadata: { word: cleanWord, message_id: message.id },
     };
-    await (supabase.from('pulse_events').insert(pulseData) as any);
+    // @ts-ignore - Supabase type inference issue
+    await supabase.from('pulse_events').insert(pulseData);
 
     // Increment click count (message is a form of engagement)
     await supabase.rpc('increment_clicks', { portrait_uuid: portraitId });
