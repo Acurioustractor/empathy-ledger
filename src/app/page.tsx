@@ -213,7 +213,7 @@ export default function Home() {
     async function fetchPortraits() {
       try {
         console.log('[Empathy Ledger] Fetching portraits from Supabase...');
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('portraits')
           .select('*')
           .order('created_at', { ascending: false });
