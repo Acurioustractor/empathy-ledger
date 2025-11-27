@@ -39,14 +39,17 @@ function DashboardContent() {
         .single();
 
       if (fetchError) throw fetchError;
-      setPortrait(data);
+
+      // Type cast since Supabase client has type inference issues
+      const typedData = data as Portrait | null;
+      setPortrait(typedData);
 
       // Fetch messages
-      if (data) {
+      if (typedData) {
         const { data: messagesData } = await supabase
           .from('messages')
           .select('*')
-          .eq('portrait_id', data.id)
+          .eq('portrait_id', typedData.id)
           .order('created_at', { ascending: false });
 
         setMessages(messagesData || []);
