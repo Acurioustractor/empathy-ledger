@@ -82,7 +82,6 @@ export function useStorytellerPortrait(accessCode: string) {
     if (!portrait) return;
 
     try {
-      // @ts-expect-error - Supabase update type inference limitation
       const { error } = await supabase
         .from('portraits')
         .update({ visible: !portrait.visible })
@@ -98,7 +97,6 @@ export function useStorytellerPortrait(accessCode: string) {
 
   const markMessageRead = useCallback(async (messageId: string) => {
     try {
-      // @ts-expect-error - Supabase update type inference limitation
       await supabase
         .from('messages')
         .update({ read: true })

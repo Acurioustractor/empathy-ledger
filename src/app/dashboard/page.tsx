@@ -96,7 +96,6 @@ function DashboardContent() {
 
     setIsToggling(true);
     try {
-      // @ts-expect-error - Supabase update type inference limitation
       const { error: updateError } = await supabase
         .from('portraits')
         .update({ visible: !portrait.visible })
@@ -115,7 +114,6 @@ function DashboardContent() {
 
   // Mark message as read
   const handleMarkRead = async (messageId: string) => {
-    // @ts-expect-error - Supabase update type inference limitation
     await supabase.from('messages').update({ read: true }).eq('id', messageId);
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))
