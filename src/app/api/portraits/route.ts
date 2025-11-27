@@ -119,7 +119,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // @ts-expect-error - Supabase type inference issue with Database schema
     const { data: portrait, error } = await supabase
       .from('portraits')
       .update(updates)
@@ -135,10 +134,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Type the portrait explicitly
-    const typedPortrait = portrait as Database['public']['Tables']['portraits']['Row'];
-
-    return NextResponse.json({ success: true, portrait: typedPortrait });
+    return NextResponse.json({ success: true, portrait });
   } catch (error) {
     console.error('Portraits PATCH error:', error);
     return NextResponse.json(
