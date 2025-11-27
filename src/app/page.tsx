@@ -229,7 +229,7 @@ export default function Home() {
 
         // Debug: log image URLs
         if (portraits.length > 0) {
-          portraits.forEach((p, i) => {
+          portraits.forEach((p: Portrait, i: number) => {
             console.log(`[Empathy Ledger] Portrait ${i + 1} image URL:`, p.image_url);
           });
         }
