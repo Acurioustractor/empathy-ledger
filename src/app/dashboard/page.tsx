@@ -96,9 +96,9 @@ function DashboardContent() {
 
     setIsToggling(true);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('portraits')
-        .update({ visible: !portrait.visible } as any)
+        .update({ visible: !portrait.visible })
         .eq('id', portrait.id);
 
       if (updateError) throw updateError;
@@ -114,7 +114,7 @@ function DashboardContent() {
 
   // Mark message as read
   const handleMarkRead = async (messageId: string) => {
-    await supabase.from('messages').update({ read: true } as any).eq('id', messageId);
+    await (supabase as any).from('messages').update({ read: true }).eq('id', messageId);
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))
     );

@@ -82,9 +82,9 @@ export function useStorytellerPortrait(accessCode: string) {
     if (!portrait) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('portraits')
-        .update({ visible: !portrait.visible } as any)
+        .update({ visible: !portrait.visible })
         .eq('id', portrait.id);
 
       if (error) throw error;
@@ -97,9 +97,9 @@ export function useStorytellerPortrait(accessCode: string) {
 
   const markMessageRead = useCallback(async (messageId: string) => {
     try {
-      await supabase
+      await (supabase as any)
         .from('messages')
-        .update({ read: true } as any)
+        .update({ read: true })
         .eq('id', messageId);
 
       setMessages((prev) =>
