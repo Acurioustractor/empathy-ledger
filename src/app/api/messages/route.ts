@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     await supabase.from('pulse_events').insert(pulseData);
 
     // Increment click count (message is a form of engagement)
+    // @ts-expect-error - Supabase RPC type inference issue
     await supabase.rpc('increment_clicks', { portrait_uuid: portraitId });
 
     return NextResponse.json({ success: true, message: typedMessage });

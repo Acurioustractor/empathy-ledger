@@ -45,8 +45,10 @@ export async function POST(request: NextRequest) {
 
     // Update stats based on event type
     if (eventType === 'view' || eventType === 'hover') {
+      // @ts-expect-error - Supabase RPC type inference issue
       await supabase.rpc('increment_views', { portrait_uuid: portraitId });
     } else if (eventType === 'click') {
+      // @ts-expect-error - Supabase RPC type inference issue
       await supabase.rpc('increment_clicks', { portrait_uuid: portraitId });
     }
 
