@@ -220,20 +220,23 @@ export default function Home() {
 
         console.log('[Empathy Ledger] Fetch result:', { data, error });
 
-        // Debug: log image URLs
-        if (data) {
-          data.forEach((p, i) => {
-            console.log(`[Empathy Ledger] Portrait ${i + 1} image URL:`, p.image_url);
-          });
-        }
-
         if (error) {
           console.error('[Empathy Ledger] Supabase error:', error);
           throw error;
         }
 
+        // Type cast since Supabase client has type inference issues
+        const typedData = (data || []) as Portrait[];
+
+        // Debug: log image URLs
+        if (typedData.length > 0) {
+          typedData.forEach((p, i) => {
+            console.log(`[Empathy Ledger] Portrait ${i + 1} image URL:`, p.image_url);
+          });
+        }
+
         // Use real data from database (even if empty)
-        setPortraits(data || []);
+        setPortraits(typedData);
         setUseDemo(false);
       } catch (err) {
         console.error('[Empathy Ledger] Fetch failed, using demo:', err);
