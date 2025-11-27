@@ -39,17 +39,14 @@ function DashboardContent() {
         .single();
 
       if (fetchError) throw fetchError;
-
-      // Type cast since Supabase client has type inference issues
-      const typedData = data as Portrait | null;
-      setPortrait(typedData);
+      setPortrait(data);
 
       // Fetch messages
-      if (typedData) {
+      if (data) {
         const { data: messagesData } = await supabase
           .from('messages')
           .select('*')
-          .eq('portrait_id', typedData.id)
+          .eq('portrait_id', data.id)
           .order('created_at', { ascending: false });
 
         setMessages(messagesData || []);
@@ -100,7 +97,6 @@ function DashboardContent() {
     try {
       const { error: updateError } = await supabase
         .from('portraits')
-        // @ts-expect-error - Client-side Supabase type inference issue
         .update({ visible: !portrait.visible })
         .eq('id', portrait.id);
 
@@ -117,7 +113,6 @@ function DashboardContent() {
 
   // Mark message as read
   const handleMarkRead = async (messageId: string) => {
-    // @ts-expect-error - Client-side Supabase type inference issue
     await supabase.from('messages').update({ read: true }).eq('id', messageId);
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))

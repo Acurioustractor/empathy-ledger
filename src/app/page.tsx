@@ -225,18 +225,17 @@ export default function Home() {
           throw error;
         }
 
-        // Type cast since Supabase client has type inference issues
-        const typedData = (data || []) as Portrait[];
+        const portraits = data || [];
 
         // Debug: log image URLs
-        if (typedData.length > 0) {
-          typedData.forEach((p, i) => {
+        if (portraits.length > 0) {
+          portraits.forEach((p, i) => {
             console.log(`[Empathy Ledger] Portrait ${i + 1} image URL:`, p.image_url);
           });
         }
 
         // Use real data from database (even if empty)
-        setPortraits(typedData);
+        setPortraits(portraits);
         setUseDemo(false);
       } catch (err) {
         console.error('[Empathy Ledger] Fetch failed, using demo:', err);
