@@ -89,6 +89,7 @@ export function useStorytellerPortrait(accessCode: string) {
     if (!portrait) return;
 
     try {
+      // @ts-expect-error - Client-side Supabase type inference issue
       const { error } = await supabase
         .from('portraits')
         .update({ visible: !portrait.visible })
@@ -104,6 +105,7 @@ export function useStorytellerPortrait(accessCode: string) {
 
   const markMessageRead = useCallback(async (messageId: string) => {
     try {
+      // @ts-expect-error - Client-side Supabase type inference issue
       await supabase
         .from('messages')
         .update({ read: true })
