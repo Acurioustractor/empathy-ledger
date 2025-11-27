@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import type { Database } from '@/lib/database.types';
+
+type PulseEventInsert = Database['public']['Tables']['pulse_events']['Insert'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,11 +27,12 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
 
     // Create pulse event (this triggers real-time notification)
-    const { error: pulseError } = await supabase.from('pulse_events').insert({
+    const pulseData: PulseEventInsert = {
       portrait_id: portraitId,
-      event_type: eventType,
+      event_type: eventType as 'view' | 'hover' | 'click' | 'message',
       metadata: metadata || null,
-    });
+    };
+    const { error: pulseError } = await supabase.from('pulse_events').insert(pulseData);
 
     if (pulseError) {
       console.error('Pulse event error:', pulseError);

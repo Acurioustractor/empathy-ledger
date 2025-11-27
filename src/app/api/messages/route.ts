@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import type { Database } from '@/lib/database.types';
+
+type MessageInsert = Database['public']['Tables']['messages']['Insert'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,12 +28,13 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
 
     // Create the message
+    const messageData: MessageInsert = {
+      portrait_id: portraitId,
+      word: cleanWord,
+    };
     const { data: message, error: messageError } = await supabase
       .from('messages')
-      .insert({
-        portrait_id: portraitId,
-        word: cleanWord,
-      })
+      .insert(messageData)
       .select()
       .single();
 
@@ -43,11 +47,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a pulse event for the message (triggers notification)
-    await supabase.from('pulse_events').insert({
+    const pulseData: Database['public']['Tables']['pulse_events']['Insert'] = {
       portrait_id: portraitId,
       event_type: 'message',
       metadata: { word: cleanWord, message_id: message.id },
-    });
+    };
+    await supabase.from('pulse_events').insert(pulseData);
 
     // Increment click count (message is a form of engagement)
     await supabase.rpc('increment_clicks', { portrait_uuid: portraitId });
