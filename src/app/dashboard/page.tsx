@@ -100,6 +100,7 @@ function DashboardContent() {
     try {
       const { error: updateError } = await supabase
         .from('portraits')
+        // @ts-expect-error - Client-side Supabase type inference issue
         .update({ visible: !portrait.visible })
         .eq('id', portrait.id);
 
@@ -116,6 +117,7 @@ function DashboardContent() {
 
   // Mark message as read
   const handleMarkRead = async (messageId: string) => {
+    // @ts-expect-error - Client-side Supabase type inference issue
     await supabase.from('messages').update({ read: true }).eq('id', messageId);
     setMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, read: true } : m))
