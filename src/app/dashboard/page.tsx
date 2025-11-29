@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MysticalBackground } from '@/components';
+import { MysticalBackground, InstallPrompt } from '@/components';
 import { useRealtimePulse } from '@/hooks/useRealtimePulse';
 import { supabase } from '@/lib/supabase';
 import { triggerVibration } from '@/lib/vibration';
@@ -433,14 +433,18 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-void-deep flex items-center justify-center">
-          <div className="w-3 h-3 rounded-full bg-accent animate-breathe" />
-        </div>
-      }
-    >
-      <DashboardContent />
-    </Suspense>
+    <>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-void-deep flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full bg-accent animate-breathe" />
+          </div>
+        }
+      >
+        <DashboardContent />
+      </Suspense>
+
+      <InstallPrompt />
+    </>
   );
 }
