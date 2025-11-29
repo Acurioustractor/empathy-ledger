@@ -6,7 +6,23 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "icons": "node scripts/generate-icons.mjs",
+    "vercel:link": "vercel link",
+    "vercel:deploy": "vercel --prod",
+    "vercel:deploy:preview": "vercel",
+    "vercel:env": "vercel env pull .env.local",
+    "vercel:logs": "vercel logs",
+    "supabase:link": "supabase link",
+    "supabase:status": "supabase status",
+    "supabase:db:pull": "supabase db pull",
+    "supabase:db:push": "supabase db push",
+    "supabase:db:diff": "supabase db diff",
+    "supabase:types": "supabase gen types typescript --local > src/lib/database.types.ts",
+    "supabase:migration:new": "supabase migration new",
+    "setup:vercel": "vercel login && vercel link",
+    "setup:supabase": "supabase login && supabase link",
+    "setup": "npm run setup:vercel && npm run setup:supabase"
   },
   "dependencies": {
     "@serwist/next": "^9.2.3",
@@ -31,6 +47,7 @@
     "postcss": "^8.4.32",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vercel": "^48.12.0"
   }
 }
