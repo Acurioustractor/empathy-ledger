@@ -18,7 +18,7 @@
     "supabase:db:pull": "supabase db pull",
     "supabase:db:push": "supabase db push",
     "supabase:db:diff": "supabase db diff",
-    "supabase:types": "supabase gen types typescript --local > src/lib/database.types.ts",
+    "supabase:types": "supabase gen types typescript --linked > src/lib/database.types.ts",
     "supabase:migration:new": "supabase migration new",
     "setup:vercel": "vercel login && vercel link",
     "setup:supabase": "supabase login && supabase link",
